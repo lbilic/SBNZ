@@ -1,0 +1,12 @@
+package com.siem;
+
+import com.siem.siem.facts.Test;
+
+rule "Test rule"
+    when
+        $t: Test( name == "name1", category == Category.NA )
+    then
+        $t.setCategory(Test.Category.TEST2);
+        System.out.println("test2");
+        update($t);
+end
