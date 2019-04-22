@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Log {
 	private String ipAddress;
-    private Date timestemp;
+    private Date timestamp;
     
     public Log() {}
   
-    public Log(String ip, Date timestemp ) {
+    public Log(String ip, Date timestamp ) {
 		this.ipAddress = ip;
-		this.timestemp = timestemp;
+		this.timestamp = timestamp;
 	}
 
 	public String getIpAddress() {
@@ -21,12 +21,12 @@ public class Log {
 		this.ipAddress = ipAddress;
 	}
 
-	public Date getTimestemp() {
-		return timestemp;
+	public Date getTimestamp() {
+		return timestamp;
 	}
 
-	public void setTimestemp(Date timestemp) {
-		this.timestemp = timestemp;
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
     
     

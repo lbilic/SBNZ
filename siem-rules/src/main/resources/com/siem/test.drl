@@ -1,12 +1,74 @@
 package com.siem;
 
-import com.siem.siem.facts.Test;
+import com.siem.siem.facts.SuccessfulLogin;
+import com.siem.siem.facts.FailedLogin;
+import com.siem.siem.facts.Log;
+import com.siem.siem.facts.ThreatDetected;
+import com.siem.siem.facts.ThreatEliminated;
+import com.siem.siem.facts.ErrorLog;
+import com.siem.siem.facts.MaliciousIps;
+import java.util.List;
 
-rule "Test rule"
-    when
-        $t: Test( name == "name1", category == Category.NA )
-    then
-        $t.setCategory(Test.Category.TEST2);
-        System.out.println("test2");
-        update($t);
+declare SuccessfulLogin
+	@role(event)
 end
+
+rule "Logging into same account on different system within 10 seconds"
+    when
+        $sl1: SuccessfulLogin()
+        $list: List(size>0) from collect(
+        	$sl2: SuccessfulLogin(username == $sl1.getUsername(),
+        					  systemType != $sl1.getSystemType(),
+        					  ipAddress != $sl1.getIpAddress(),
+        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) > 0,
+        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) < 10))
+    then
+        System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
+end
+
+rule "Threat not beeing removed withing 1 hour"
+    when
+    	$td : ThreatDetected($id : threatId, $ip : ipAddress)
+    	not($te : ThreatEliminated( threatId == $id, ipAddress == $ip,
+    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) >= 0,
+    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) < 60))
+    	$te : ThreatEliminated()
+    then
+        System.out.println("Threat was not eliminated within 1 hour");
+end
+
+rule "Error log detected"
+	when
+		$el : ErrorLog()
+	then
+		System.out.println("Error log detected");
+end
+
+rule "Log detected"
+	when
+		$list : List(size>0) from collect($log: Log())
+	then
+		System.out.println("List ->" + $list.size());
+end
+
+rule "Malicious ip detected in successful login"
+	when
+		$sl1: SuccessfulLogin(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in successful login");
+end
+
+rule "Malicious ip detected in failed login"
+	when
+		$sl1: FailedLogin(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in failed login");
+end
+
+rule "Malicious ip detected in log"
+	when
+		$sl1: Log(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in log");
+end
+

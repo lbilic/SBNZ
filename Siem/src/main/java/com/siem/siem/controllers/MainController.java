@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.siem.siem.facts.SuccessfulLogin;
@@ -24,8 +25,8 @@ public class MainController {
 		this.testService = testService;
 	}
 
-	@RequestMapping(value = "/test")
-    public SuccessfulLogin test() {
+	@RequestMapping(value = "/test_inactive")
+    public SuccessfulLogin test_inactive() {
     	SuccessfulLogin newItem = new SuccessfulLogin(null, "meh", "sadsa", new GregorianCalendar(2019, Calendar.MARCH, 11).getTime());
 
 		log.debug("Item request received for: " + newItem);
@@ -43,5 +44,11 @@ public class MainController {
 	@RequestMapping(value = "/test_multiple_failed_username")
 	public void testMultipleFailedUsername() {
     	testService.testMultipleFailedUsername();
+	}
+	
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public String test() {
+    	testService.testIt();
+        return "Uspeh!!!!";
     }
 }
