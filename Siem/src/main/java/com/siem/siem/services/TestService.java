@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.siem.siem.facts.ErrorLog;
+import com.siem.siem.facts.FailedLogin;
 import com.siem.siem.facts.SuccessfulLogin;
 import com.siem.siem.facts.SystemTypes;
 import com.siem.siem.facts.ThreatDetected;
@@ -44,6 +45,10 @@ public class TestService {
 		te.setTimestamp(DateUtils.addHours(te.getTimestamp(), 3));
 		kieSession.insert(new ErrorLog("Some message","ip12304109",new Date()));
 		kieSession.insert(te);
+		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1" , new Date()));
+		kieSession.insert(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2" , new Date()));
+		kieSession.insert(new ErrorLog("message", "ip1" , new Date()));
+
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		

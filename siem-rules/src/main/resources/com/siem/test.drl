@@ -1,10 +1,12 @@
 package com.siem;
 
 import com.siem.siem.facts.SuccessfulLogin;
+import com.siem.siem.facts.FailedLogin;
 import com.siem.siem.facts.Log;
 import com.siem.siem.facts.ThreatDetected;
 import com.siem.siem.facts.ThreatEliminated;
 import com.siem.siem.facts.ErrorLog;
+import com.siem.siem.facts.MaliciousIps;
 import java.util.List;
 
 declare SuccessfulLogin
@@ -48,3 +50,25 @@ rule "Log detected"
 	then
 		System.out.println("List ->" + $list.size());
 end
+
+rule "Malicious ip detected in successful login"
+	when
+		$sl1: SuccessfulLogin(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in successful login");
+end
+
+rule "Malicious ip detected in failed login"
+	when
+		$sl1: FailedLogin(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in failed login");
+end
+
+rule "Malicious ip detected in log"
+	when
+		$sl1: Log(MaliciousIps.maliciousIps contains ipAddress)
+	then
+		System.out.println("Malicious ip detected in log");
+end
+
