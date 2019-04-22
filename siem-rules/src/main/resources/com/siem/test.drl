@@ -1,12 +1,50 @@
 package com.siem;
 
-import com.siem.siem.facts.Test;
+import com.siem.siem.facts.SuccessfulLogin;
+import com.siem.siem.facts.Log;
+import com.siem.siem.facts.ThreatDetected;
+import com.siem.siem.facts.ThreatEliminated;
+import com.siem.siem.facts.ErrorLog;
+import java.util.List;
 
-rule "Test rule"
+declare SuccessfulLogin
+	@role(event)
+end
+
+rule "Logging into same account on different system within 10 seconds"
     when
-        $t: Test( name == "name1", category == Category.NA )
+        $sl1: SuccessfulLogin()
+        $list: List(size>0) from collect(
+        	$sl2: SuccessfulLogin(username == $sl1.getUsername(),
+        					  systemType != $sl1.getSystemType(),
+        					  ipAddress != $sl1.getIpAddress(),
+        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) > 0,
+        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) < 10))
     then
-        $t.setCategory(Test.Category.TEST2);
-        System.out.println("test2");
-        update($t);
+        System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
+end
+
+rule "Threat not beeing removed withing 1 hour"
+    when
+    	$td : ThreatDetected($id : threatId, $ip : ipAddress)
+    	not($te : ThreatEliminated( threatId == $id, ipAddress == $ip,
+    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) >= 0,
+    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) < 60))
+    	$te : ThreatEliminated()
+    then
+        System.out.println("Threat was not eliminated within 1 hour");
+end
+
+rule "Error log detected"
+	when
+		$el : ErrorLog()
+	then
+		System.out.println("Error log detected");
+end
+
+rule "Log detected"
+	when
+		$list : List(size>0) from collect($log: Log())
+	then
+		System.out.println("List ->" + $list.size());
 end

@@ -23,7 +23,7 @@ public class MainController {
 		this.testService = testService;
 	}
 
-    @RequestMapping(value = "/test")
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
     public String test() {
     	testService.testIt();
         return "Uspeh!!!!";
