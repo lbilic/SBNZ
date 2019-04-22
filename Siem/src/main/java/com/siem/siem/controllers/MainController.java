@@ -25,18 +25,7 @@ public class MainController {
 
     @RequestMapping(value = "/test")
     public String test() {
+    	testService.testIt();
         return "Uspeh!!!!";
     }
-    
-    @RequestMapping(value = "/test2", method = RequestMethod.GET, produces = "application/json")
-	public Test getQuestions(@RequestParam(required = true) String id, @RequestParam(required = true) String name) {
-
-		Test newItem = new Test(Long.parseLong(id), name);
-
-		log.debug("Item request received for: " + newItem);
-
-		Test i2 = testService.getClassifiedItem(newItem);
-
-		return i2;
-	}
 }

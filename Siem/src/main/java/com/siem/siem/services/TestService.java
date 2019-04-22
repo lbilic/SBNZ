@@ -21,11 +21,11 @@ public class TestService {
 		this.kieContainer = kieContainer;
 	}
 
-	public Test getClassifiedItem(Test t) {
+	public void testIt() {
 		KieSession kieSession = kieContainer.newKieSession();
-		kieSession.insert(t);
+		kieSession.insert(new Test(1L, "Ime"));
 		kieSession.fireAllRules();
 		kieSession.dispose();
-		return t;
+		return;
 	}
 }
