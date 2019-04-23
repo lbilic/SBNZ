@@ -82,4 +82,20 @@ public class TestService {
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}
+	
+	public void testDOS() {
+		KieSession kieSession = kieContainer.newKieSession("SiemSession");
+		for(int i = 0; i < 11; i++) {
+			kieSession.insert(new FailedLogin(SystemTypes.IS1,"random_user" + i,"random_ip" + i,new Date()));
+		}
+		/*try {
+			Thread.sleep(11000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		kieSession.insert(new FailedLogin(SystemTypes.IS1,"random_user11","random_ip11",new Date()));*/
+		kieSession.fireAllRules();
+		kieSession.dispose();
+	}
 }

@@ -51,4 +51,10 @@ public class MainController {
     	testService.testIt();
         return "Uspeh!!!!";
     }
+
+    @RequestMapping(value = "/test_dos", method = RequestMethod.GET)
+    public String testDos() {
+    	testService.testDOS();
+        return "Dos test done";
+    }
 }

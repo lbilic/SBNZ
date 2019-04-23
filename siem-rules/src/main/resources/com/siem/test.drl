@@ -13,6 +13,10 @@ declare SuccessfulLogin
 	@role(event)
 end
 
+declare FailedLogin
+	@role(event)
+end
+
 rule "Logging into same account on different system within 10 seconds"
     when
         $sl1: SuccessfulLogin()
@@ -71,4 +75,12 @@ rule "Malicious ip detected in log"
 	then
 		System.out.println("Malicious ip detected in log");
 end
+
+rule "DOS - Brute-force alarm"
+	when
+		$list: List(size>10) from collect( FailedLogin() over window:time(10s))
+	then
+		System.out.println("Activate Brute-force alarm");
+end
+
 

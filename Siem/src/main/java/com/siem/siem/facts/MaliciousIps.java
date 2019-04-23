@@ -13,4 +13,11 @@ public class MaliciousIps {
 	    add("ip6");
 	}};
 	
+	public static int calcModificator(Class objClass) {
+		/*if(objClass == FailedLogin.class) {
+			return 5;
+		}else if(objClass == )*/
+		return 0;
+	}
+	
 }
