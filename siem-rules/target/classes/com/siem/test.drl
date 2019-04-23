@@ -2,6 +2,7 @@ package com.siem;
 
 import com.siem.siem.facts.SuccessfulLogin;
 import com.siem.siem.facts.FailedLogin;
+import com.siem.siem.facts.ProfileChange;
 import com.siem.siem.facts.Log;
 import com.siem.siem.facts.ThreatDetected;
 import com.siem.siem.facts.ThreatEliminated;
@@ -14,6 +15,10 @@ declare SuccessfulLogin
 end
 
 declare FailedLogin
+	@role(event)
+end
+
+declare ThreatDetected
 	@role(event)
 end
 
@@ -83,4 +88,20 @@ rule "DOS - Brute-force alarm"
 		System.out.println("Activate Brute-force alarm");
 end
 
+rule "Profile change after 5 bad attepmts from same ip"
+	when
+		$fl : ProfileChange( $ip : ipAddress , $ts : timestamp, $sys : systemType)
+		$sl : SuccessfulLogin( ipAddress == $ip, $ts2 : timestamp ,!timestamp.after($ts), systemType == $sys)
+		$list : List(size>5) from collect( FailedLogin( ipAddress == $ip, !timestamp.after($ts2)) over window:time(90s))
+	then
+		System.out.println("Someone changed profile after few bad attempts");
+end
+
+rule "10 threats detected on same ip"
+	when
+		ThreatDetected( $ip : ipAddress)
+		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
+	then
+		System.out.println("Ip address with high risk detected");
+end
 

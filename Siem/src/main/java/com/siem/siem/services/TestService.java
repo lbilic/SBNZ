@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.siem.siem.facts.ErrorLog;
 import com.siem.siem.facts.FailedLogin;
+import com.siem.siem.facts.ProfileChange;
 import com.siem.siem.facts.SuccessfulLogin;
 import com.siem.siem.facts.SystemTypes;
 import com.siem.siem.facts.Test;
@@ -79,6 +80,26 @@ public class TestService {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
 		kieSession.insert(new FailedLogin(null, "username", "localhost", new Date()));
 		kieSession.insert(new FailedLogin(null, "username", "localhost", new Date()));
+		kieSession.fireAllRules();
+		kieSession.dispose();
+	}
+	
+	public void testProfileChange() {
+		KieSession kieSession = kieContainer.newKieSession("SiemSession");
+		for(int i=0;i<6;i++) {
+			kieSession.insert(new FailedLogin(SystemTypes.IS2, "username", "localhost", new Date()));
+		}
+		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "username", "localhost", new Date()));
+		kieSession.insert(new ProfileChange(SystemTypes.IS2, "username", "localhost", new Date()));
+		kieSession.fireAllRules();
+		kieSession.dispose();
+	}
+
+	public void testAntivirusSamePC() {
+		KieSession kieSession = kieContainer.newKieSession("SiemSession");
+		for(int i=0;i<6;i++) {
+			kieSession.insert(new ThreatDetected(Integer.toUnsignedLong(i),"localhost" + i%2, new Date()));
+		}
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}

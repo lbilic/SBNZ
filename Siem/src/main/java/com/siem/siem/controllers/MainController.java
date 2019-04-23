@@ -57,4 +57,16 @@ public class MainController {
     	testService.testDOS();
         return "Dos test done";
     }
+
+    @RequestMapping(value = "/test_profile_change", method = RequestMethod.GET)
+    public String testProfileChange() {
+    	testService.testProfileChange();
+        return "Profile change test done";
+    }
+
+    @RequestMapping(value = "/test_antivirus", method = RequestMethod.GET)
+    public String testAntivirus() {
+    	testService.testAntivirusSamePC();
+        return "Antivirus test done";
+    }
 }
