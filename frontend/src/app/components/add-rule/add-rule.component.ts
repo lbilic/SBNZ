@@ -11,7 +11,15 @@ import { Rule } from '../../model/rule';
 export class AddRuleComponent implements OnInit {
 
   form: FormGroup;
-  pravilo: string;
+  rules = [
+    "Error log",
+    "FailedLogin",
+    "SuccessfulLogin",
+    "Log",
+    "MaliciousIps",
+    "ThreatDetected",
+    "ThreatEliminated"
+  ]
 
   constructor(private fb: FormBuilder, private ruleService: RuleService) { 
     this.form = this.fb.group({

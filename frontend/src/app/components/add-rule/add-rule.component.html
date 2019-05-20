@@ -6,7 +6,13 @@
     <form class="rule-form" [formGroup]="form" (ngSubmit)="submit()">
       <div class="col-4" style="float: left;">
         <mat-form-field class="input-full-width">
-          <input matInput placeholder="Rule" formControlName="rule" id="rule" type="text">
+          <!--input matInput placeholder="Rule" formControlName="rule" id="rule"-->
+          <mat-label>Rule</mat-label>
+          <mat-select formControlName="rule">
+            <mat-option *ngFor="let rule of rules" [value]="rule">
+              {{rule}}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
 
