@@ -1,10 +1,18 @@
 package com.siem.siem;
 
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
+import org.kie.internal.utils.KieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +21,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
 
 @SpringBootApplication
 public class SiemApplication extends SpringBootServletInitializer {
@@ -46,5 +57,4 @@ public class SiemApplication extends SpringBootServletInitializer {
 		kScanner.start(10_000);
 		return kContainer;
 	}
-
 }
