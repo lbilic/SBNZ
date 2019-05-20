@@ -1,0 +1,36 @@
+<div class="container" style="text-align: center;">
+  <div class="row">
+    <h1>New rule:</h1>
+  </div>
+  <div class="row" style="display: inline-block">
+    <form class="rule-form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Rule" formControlName="rule" id="rule" type="text">
+        </mat-form-field>
+      </div>
+
+      <div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Field" formControlName="field" id="field" type="text">
+        </mat-form-field>
+      </div>
+
+      <div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Value" formControlName="value" id="value" type="text">
+        </mat-form-field>
+      </div>
+
+      <div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Interval" formControlName="interval" id="interval" type="text">
+        </mat-form-field>
+      </div>
+
+      <div class="col-4" style="float: left;">
+          <button mat-flat-button color="primary" type='submit'>Submit</button>
+      </div>
+    </form>
+  </div>
+</div>

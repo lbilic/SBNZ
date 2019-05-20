@@ -2,7 +2,10 @@ package com.siem;
 
 import com.siem.siem.facts.SuccessfulLogin;
 import com.siem.siem.facts.FailedLogin;
+<<<<<<< Updated upstream
 import com.siem.siem.facts.ProfileChange;
+=======
+>>>>>>> Stashed changes
 import com.siem.siem.facts.Log;
 import com.siem.siem.facts.ThreatDetected;
 import com.siem.siem.facts.ThreatEliminated;
@@ -81,6 +84,7 @@ rule "Malicious ip detected in log"
 		System.out.println("Malicious ip detected in log");
 end
 
+<<<<<<< Updated upstream
 rule "DOS - Brute-force alarm"
 	when
 		$list: List(size>10) from collect( FailedLogin() over window:time(10s))
@@ -105,3 +109,5 @@ rule "10 threats detected on same ip"
 		System.out.println("Ip address with high risk detected");
 end
 
+=======
+>>>>>>> Stashed changes
