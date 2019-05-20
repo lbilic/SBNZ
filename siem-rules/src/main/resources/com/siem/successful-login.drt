@@ -1,0 +1,26 @@
+template header
+interval
+
+import com.sime.siem.facts.SuccessfulLogin;
+
+template "successful-login-rules"
+
+rule "Logging into same account on different system within @{interval} seconds"
+    when
+        $sl1: SuccessfulLogin($username : username, $systemType: systemType, $ipAddress: ipAddress)
+         Number(intValue >= 1) from accumulate(
+            $t2: SuccessfulLogin(
+                this != $sl1, 
+                username == $username, 
+                systemType == $systemType,
+                ipAddress == $ipAddress,
+                this meets[@{interval}s] $sl1
+            ),
+            count($t2)
+        )
+    then
+       System.out.println("Logging into same account on different system within 10 sec activated");
+end
+
+end template
+

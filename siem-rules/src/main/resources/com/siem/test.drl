@@ -22,15 +22,23 @@ declare ThreatDetected
 	@role(event)
 end
 
+declare ThreatEliminated
+	@role(event)
+end
+
 rule "Logging into same account on different system within 10 seconds"
     when
-        $sl1: SuccessfulLogin()
-        $list: List(size>0) from collect(
-        	$sl2: SuccessfulLogin(username == $sl1.getUsername(),
-        					  systemType != $sl1.getSystemType(),
-        					  ipAddress != $sl1.getIpAddress(),
-        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) > 0,
-        					  ((timestamp.getTime()-$sl1.getTimestamp().getTime())/1000) < 10))
+        $sl1: SuccessfulLogin($username : username, $systemType: systemType, $ipAddress: ipAddress)
+         Number(intValue >= 1) from accumulate(
+            $t2: SuccessfulLogin(
+                this != $sl1, 
+                username == $username, 
+                systemType == $systemType,
+                ipAddress == $ipAddress,
+                this meets[10s] $sl1
+            ),
+            count($t2)
+        )
     then
         System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
 end
@@ -39,8 +47,7 @@ rule "Threat not beeing removed withing 1 hour"
     when
     	$td : ThreatDetected($id : threatId, $ip : ipAddress)
     	not($te : ThreatEliminated( threatId == $id, ipAddress == $ip,
-    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) >= 0,
-    								((timestamp.getTime()-$td.getTimestamp().getTime())/60000) < 60))
+    								 this meets[1h] $td))
     	$te : ThreatEliminated()
     then
         System.out.println("Threat was not eliminated within 1 hour");

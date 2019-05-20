@@ -1,11 +1,21 @@
 package com.siem.siem.services;
+
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.drools.template.DataProvider;
+import org.drools.template.DataProviderCompiler;
+import org.drools.template.objects.ArrayDataProvider;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,32 +43,50 @@ public class TestService {
 	}
 
 	public void testIt() {
-		KieSession kieSession = kieContainer.newKieSession("SiemSession");
+		InputStream template = TestService.class.getResourceAsStream("/com/siem/successful-login.drt");
+        
+        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
+            new String[]{"18"},
+            new String[]{"22"},
+            new String[]{"31"},
+            new String[]{"41"}
+        });
+        
+        System.out.println(template);
+        DataProviderCompiler converter = new DataProviderCompiler();
+        String drl = converter.compile(dataProvider, template);
+        
+        System.out.println(drl);
+        
+        KieSession kieSession = createKieSessionFromDRL(drl);
+		// KieSession kieSession = kieContainer.newKieSession("SiemSession");
 		kieSession.insert(new Test(1L, "Ime"));
-		kieSession.insert(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123" , new Date()));
+		kieSession.insert(new ThreatDetected(1l, "ip123", new Date()));
+		kieSession.insert(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123", new Date()));
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234" , new Date()));
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur", "ip12345" , new Date()));
-		kieSession.insert(new ThreatDetected(1l,"ip123",new Date()));
-		ThreatEliminated te = new ThreatEliminated(1l,"ip123", new Date());
+		}
+		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
+		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
+
+		ThreatEliminated te = new ThreatEliminated(1l, "ip123", new Date());
 		te.setTimestamp(DateUtils.addHours(te.getTimestamp(), 3));
-		kieSession.insert(new ErrorLog("Some message","ip12304109",new Date()));
+		kieSession.insert(new ErrorLog("Some message", "ip12304109", new Date()));
 		kieSession.insert(te);
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1" , new Date()));
-		kieSession.insert(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2" , new Date()));
-		kieSession.insert(new ErrorLog("message", "ip1" , new Date()));
+		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
+		kieSession.insert(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2", new Date()));
+		kieSession.insert(new ErrorLog("message", "ip1", new Date()));
 		kieSession.fireAllRules();
 		kieSession.dispose();
-		
+
 		System.out.println("Done with rules");
+
 		return;
 	}
-	
+
 	public SuccessfulLogin testInactive(SuccessfulLogin sl) {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
 		kieSession.insert(sl);
@@ -66,16 +94,17 @@ public class TestService {
 		kieSession.dispose();
 		return sl;
 	}
-	
+
 	public void testMultipleFailedIp() {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
-		for(int i = 0; i < 15; i++) {
-			kieSession.insert(new FailedLogin(null, null, "localhost", new GregorianCalendar(2019, Calendar.MARCH, 1+i).getTime()));
+		for (int i = 0; i < 15; i++) {
+			kieSession.insert(new FailedLogin(null, null, "localhost",
+					new GregorianCalendar(2019, Calendar.MARCH, 1 + i).getTime()));
 		}
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}
-	
+
 	public void testMultipleFailedUsername() {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
 		kieSession.insert(new FailedLogin(null, "username", "localhost", new Date()));
@@ -83,10 +112,10 @@ public class TestService {
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}
-	
+
 	public void testProfileChange() {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
-		for(int i=0;i<6;i++) {
+		for (int i = 0; i < 6; i++) {
 			kieSession.insert(new FailedLogin(SystemTypes.IS2, "username", "localhost", new Date()));
 		}
 		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "username", "localhost", new Date()));
@@ -97,26 +126,42 @@ public class TestService {
 
 	public void testAntivirusSamePC() {
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
-		for(int i=0;i<6;i++) {
-			kieSession.insert(new ThreatDetected(Integer.toUnsignedLong(i),"localhost" + i%2, new Date()));
+		for (int i = 0; i < 6; i++) {
+			kieSession.insert(new ThreatDetected(Integer.toUnsignedLong(i), "localhost" + i % 2, new Date()));
 		}
+		kieSession.fireAllRules();
+		kieSession.dispose();
+	}
+
+	public void testDOS() {
+		KieSession kieSession = kieContainer.newKieSession("SiemSession");
+		for (int i = 0; i < 11; i++) {
+			kieSession.insert(new FailedLogin(SystemTypes.IS1, "random_user" + i, "random_ip" + i, new Date()));
+		}
+		/*
+		 * try { Thread.sleep(11000); } catch (InterruptedException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); } kieSession.insert(new
+		 * FailedLogin(SystemTypes.IS1,"random_user11","random_ip11",new Date()));
+		 */
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}
 	
-	public void testDOS() {
-		KieSession kieSession = kieContainer.newKieSession("SiemSession");
-		for(int i = 0; i < 11; i++) {
-			kieSession.insert(new FailedLogin(SystemTypes.IS1,"random_user" + i,"random_ip" + i,new Date()));
-		}
-		/*try {
-			Thread.sleep(11000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		kieSession.insert(new FailedLogin(SystemTypes.IS1,"random_user11","random_ip11",new Date()));*/
-		kieSession.fireAllRules();
-		kieSession.dispose();
-	}
+	private KieSession createKieSessionFromDRL(String drl){
+        KieHelper kieHelper = new KieHelper();
+        kieHelper.addContent(drl, ResourceType.DRL);
+        
+        Results results = kieHelper.verify();
+        
+        if (results.hasMessages(Message.Level.WARNING, Message.Level.ERROR)){
+            List<Message> messages = results.getMessages(Message.Level.WARNING, Message.Level.ERROR);
+            for (Message message : messages) {
+                System.out.println("Error: "+message.getText());
+            }
+            
+            throw new IllegalStateException("Compilation errors were found. Check the logs.");
+        }
+        
+        return kieHelper.build().newKieSession();
+    }
 }

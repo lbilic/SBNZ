@@ -1,0 +1,17 @@
+template header
+interval
+
+template "threat-not-removed"
+
+rule "Threat not beeing removed withing @{interval} hour"
+    when
+    	$td : ThreatDetected($id : threatId, $ip : ipAddress)
+    	not($te : ThreatEliminated( threatId == $id, ipAddress == $ip,
+    								 this meets[@{interval}h] $td))
+    	$te : ThreatEliminated()
+    then
+        System.out.println("Threat was not eliminated within @{interval} hour");
+end
+
+
+end template
