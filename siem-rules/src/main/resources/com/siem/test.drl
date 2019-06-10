@@ -8,6 +8,12 @@ import com.siem.siem.facts.ThreatDetected;
 import com.siem.siem.facts.ThreatEliminated;
 import com.siem.siem.facts.ErrorLog;
 import com.siem.siem.facts.MaliciousIps;
+import com.siem.siem.events.SameAccountDifferenSystemsEvent;
+import com.siem.siem.events.ThreatNotRemovedEvent;
+import com.siem.siem.events.ProfileChangedAfterFailedLoginEvent;
+import com.siem.siem.events.MultipleThreatsDetectedEvent;
+import com.siem.siem.events.MaliciousIpLoginSuccess;
+import com.siem.siem.events.MaliciousIpLoginFailed;
 import java.util.List;
 
 declare SuccessfulLogin
@@ -41,6 +47,8 @@ rule "Logging into same account on different system within 10 seconds"
         )
     then
         System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
+		insert(new SameAccountDifferenSystemsEvent($sl1.getUsername(), "Logging into same account on different system within 10 sec"));
+        drools.halt();
 end
 
 rule "Threat not beeing removed withing 1 hour"
@@ -51,6 +59,8 @@ rule "Threat not beeing removed withing 1 hour"
     	$te : ThreatEliminated()
     then
         System.out.println("Threat was not eliminated within 1 hour");
+        insert(new ThreatNotRemovedEvent($threatId, "Threat was not eliminated within 1 hour"));
+        drools.halt();
 end
 
 rule "Error log detected"
@@ -72,6 +82,9 @@ rule "Malicious ip detected in successful login"
 		$sl1: SuccessfulLogin(MaliciousIps.maliciousIps contains ipAddress)
 	then
 		System.out.println("Malicious ip detected in successful login");
+		insert(new MaliciousIpLoginSuccess($ipAddress, "Malicious ip detected in successful login"));
+        drools.halt();
+		
 end
 
 rule "Malicious ip detected in failed login"
@@ -79,6 +92,8 @@ rule "Malicious ip detected in failed login"
 		$sl1: FailedLogin(MaliciousIps.maliciousIps contains ipAddress)
 	then
 		System.out.println("Malicious ip detected in failed login");
+		insert(new MaliciousIpLoginFailed($ipAddress, "Malicious ip detected in failed login"));
+        drools.halt();
 end
 
 rule "Malicious ip detected in log"
@@ -102,6 +117,8 @@ rule "Profile change after 5 bad attepmts from same ip"
 		$list : List(size>5) from collect( FailedLogin( ipAddress == $ip, !timestamp.after($ts2)) over window:time(90s))
 	then
 		System.out.println("Someone changed profile after few bad attempts");
+		insert(new ProfileChangedAfterFailedLoginEvent($ipAddress, "Profile change after 5 bad attepmts from same ip"));
+        drools.halt();
 end
 
 rule "10 threats detected on same ip"
@@ -110,5 +127,7 @@ rule "10 threats detected on same ip"
 		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
 	then
 		System.out.println("Ip address with high risk detected");
+		insert(new MultipleThreatsDetectedEvent($ipAddress, "Ip address with high risk detected"));
+        drools.halt();
 end
 
