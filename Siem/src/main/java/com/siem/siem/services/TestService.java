@@ -83,6 +83,8 @@ public class TestService {
 		sessionHandler.insertLogIntoSession(new ThreatDetected(8l, "ip123", new Date()));
 		sessionHandler.insertLogIntoSession(new ThreatDetected(9l, "ip123", new Date()));
 		sessionHandler.insertLogIntoSession(new ThreatDetected(10l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(11l, "ip123", new Date()));
+		
 		sessionHandler.insertAccountIntoSession(new Account(1l, "username", "ip123"));
 		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123", new Date()));
 		try {
@@ -99,7 +101,9 @@ public class TestService {
 		sessionHandler.insertLogIntoSession(new ErrorLog("Some message", "ip12304109", new Date()));
 //		kieSession.insert(te);
 		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
-		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip2", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip3", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip4", new Date()));
 		sessionHandler.insertLogIntoSession(new ErrorLog("message", "ip1", new Date()));
 
 		kieSession.fireAllRules();
@@ -109,11 +113,10 @@ public class TestService {
 		for (QueryResultsRow row : queryResults) {
 			System.out.println(((Account) row.get("account")).getIpAddress());
 		}
-		queryResults = sessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
-		
-		
-		for(Object o : kieSession.getObjects()) {
-			System.out.println(o.toString());
+		queryResults = sessionHandler.getQueryResultsForQueryParameter("account with N failed logins", "5");
+		System.out.println(queryResults.size());
+		for (QueryResultsRow row : queryResults) {
+			System.out.println(((Account) row.get("account")).getIpAddress());
 		}
 		System.out.println("Done with rules");
 

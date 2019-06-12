@@ -5,5 +5,29 @@ import com.siem.siem.model.Account;
 
 query "account with 10 antivirus alarms in 10 days" 
     account : Account( $ip : ipAddress)
-	list : List(size>9) from collect( MultipleThreatsDetectedEvent( ipAddress == $ip ) over window:time(10d))
+	list : List(size>0) from collect( MultipleThreatsDetectedEvent( ipAddress == $ip ) over window:time(10d))
+end
+
+query "account with N failed logins" (String numberOfIps)
+    account : Account( $username : username)
+    $failedLogins: List() from collect(FailedLogin(username == $username))
+	x : Number(intValue >= (int)numberOfIps) from accumulate(
+	    FailedLogin($ipAddress : ipAddress) from $failedLogins,
+	    init(int count = 0;
+	    List<String> lista = new ArrayList();),
+	    action(
+	     for(String no : lista) {
+	     	if(no.contains($ipAddress)){
+	     		return;
+	     	}
+	     }
+	     lista.add($ipAddress);
+	     count += 1;),
+	    result(count)
+    )
+end
+
+query "account with 6 alarms" (String numberOfIps)
+    account : Account( $username : username)
+	list : List(size>(int)numberOfIps) from collect( FailedLogin( username == $username ) over window:time(12h))
 end

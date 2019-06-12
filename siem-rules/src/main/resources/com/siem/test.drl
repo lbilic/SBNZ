@@ -115,7 +115,7 @@ end
 
 rule "10 threats detected on same ip"
 	when
-		ThreatDetected( $ip : ipAddress)
+		account : Account( $ip : ipAddress)
 		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
 	then
 		System.out.println("Ip address with high risk detected");
