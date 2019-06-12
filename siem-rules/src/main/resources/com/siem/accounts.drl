@@ -5,5 +5,5 @@ import com.siem.siem.model.Account;
 
 query "account with 10 antivirus alarms in 10 days" 
     account : Account( $ip : ipAddress)
-	list : List(size>1) from collect( MultipleThreatsDetectedEvent( ipAddress == $ip ) over window:time(10d))
+	list : List(size>9) from collect( MultipleThreatsDetectedEvent( ipAddress == $ip ) over window:time(10d))
 end

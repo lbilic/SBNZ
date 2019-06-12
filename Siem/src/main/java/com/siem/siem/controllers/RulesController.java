@@ -1,6 +1,7 @@
 package com.siem.siem.controllers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,5 +48,9 @@ public class RulesController {
 		logsService.insertAccount(account);
     }
 
+	@RequestMapping(method= RequestMethod.GET, value = "/logs")
+    public Collection<? extends Object> getLogs() {
+		return logsService.getLogs();
+    }
 
 }

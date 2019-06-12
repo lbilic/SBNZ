@@ -1,5 +1,6 @@
 package com.siem.siem.utils;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.kie.api.runtime.KieContainer;
@@ -67,6 +68,10 @@ public class SessionHandler {
 	
 	public QueryResults getQueryResultsForQuery(String string) {
 		return SiemApplication.allSessions.get("SiemSession").getQueryResults(string);
+	}
+	
+	public Collection<? extends Object> getAllLogs() {
+		return SiemApplication.allSessions.get("SiemSession").getObjects();
 	}
 
 }

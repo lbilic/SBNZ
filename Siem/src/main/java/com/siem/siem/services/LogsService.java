@@ -1,5 +1,8 @@
 package com.siem.siem.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,4 +27,10 @@ public class LogsService {
 		sessionHandler.createNewSession();
 		sessionHandler.insertAccountIntoSession(l);
 	}
+	
+	public Collection<? extends Object> getLogs() {
+		sessionHandler.createNewSession();
+		return sessionHandler.getAllLogs();
+	}
+	
 }
