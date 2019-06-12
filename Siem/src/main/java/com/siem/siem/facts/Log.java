@@ -28,6 +28,11 @@ public class Log {
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	@Override
+	public String toString() {
+		return "Log [ipAddress=" + ipAddress + ", timestamp=" + timestamp + "]";
+	}
     
     
 

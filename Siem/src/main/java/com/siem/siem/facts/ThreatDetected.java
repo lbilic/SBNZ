@@ -19,4 +19,11 @@ public class ThreatDetected extends Log {
 	public void setThreatId(Long threatId) {
 		this.threatId = threatId;
 	}
+
+	@Override
+	public String toString() {
+		return "ThreatDetected [threatId=" + threatId + ", toString()=" + super.toString() + "]";
+	}
+	
+	
 }

@@ -19,8 +19,7 @@ rule "Multiple failed logins on the same machine"
         $list: ArrayList(size >= 2) from collect(FailedLogin(ipAddress == $ipAddress, ((new Date()).getTime() - $fl.getTimestamp().getTime()) / (1000) < 10))
     then
         System.out.println($list.size() + " neuspesnih loginova sa iste masine u poslednjih 10s");
-		insert(new FailedLoginSameSystemEvent($ipAddress, "Multiple failed logins on the same machine"));
-        drools.halt();
+		insert(new FailedLoginSameSystemEvent( $fl.getIpAddress(), "Multiple failed logins on the same machine"));
 end
 
 declare FailedLogin
@@ -34,8 +33,7 @@ rule "Multiple failed logins with the same username"
 							((timestamp.getTime()-$fl1.getTimestamp().getTime())/1000) < 10))
     then
         System.out.println($list.size() + " neuspesnih loginova sa istim username-om u poslednjih 10s");
-		insert(new FailedLoginSameUsernameEvent($ipAddress, "Multiple failed logins with the same username"));
-        drools.halt();
+		insert(new FailedLoginSameUsernameEvent($fl1.getIpAddress(), "Multiple failed logins with the same username"));
 end
 
 rule "Inactive account login"
@@ -58,8 +56,7 @@ rule "Multiple unique failed logins from the same ip address"
         $list: ArrayList(size >= 15) from collect(FailedLogin(systemType != $fl.getSystemType(), this == $fl, ipAddress == $ipAddress, ((new Date()).getTime() - $fl.getTimestamp().getTime) / (24 * 60 * 60 * 1000) < 5))
     then
         System.out.println($list.size() + " failed logins from " + $ipAddress);
-        insert(new MultipleFailedLoginsSameIpAddressEvent($ipAddress, "Multiple unique failed logins from the same ip addressn"));
-        drools.halt();
+        insert(new MultipleFailedLoginsSameIpAddressEvent($fl.getIpAddress(), "Multiple unique failed logins from the same ip addressn"));
 end
 
 rule "ERROR log"

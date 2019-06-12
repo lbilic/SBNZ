@@ -3,7 +3,9 @@ package com.siem.siem;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieServices;
@@ -29,7 +31,9 @@ import org.kie.internal.utils.KieHelper;
 public class SiemApplication extends SpringBootServletInitializer {
 	
 	private static Logger log = LoggerFactory.getLogger(SiemApplication.class);
-
+	
+	public static Map<String, KieSession> allSessions = new HashMap<String, KieSession>();
+	
 	public static void main(String[] args) {
 		ApplicationContext ctx = SpringApplication.run(SiemApplication.class, args);
 

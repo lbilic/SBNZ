@@ -15,12 +15,15 @@ import org.kie.api.builder.Results;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.internal.utils.KieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.siem.siem.SiemApplication;
 import com.siem.siem.facts.ErrorLog;
 import com.siem.siem.facts.FailedLogin;
 import com.siem.siem.facts.ProfileChange;
@@ -29,6 +32,8 @@ import com.siem.siem.facts.SystemTypes;
 import com.siem.siem.facts.Test;
 import com.siem.siem.facts.ThreatDetected;
 import com.siem.siem.facts.ThreatEliminated;
+import com.siem.siem.model.Account;
+import com.siem.siem.utils.SessionHandler;
 
 @Service
 public class TestService {
@@ -42,7 +47,10 @@ public class TestService {
 		this.kieContainer = kieContainer;
 	}
 
-	public void testIt() {
+	@Autowired
+	SessionHandler mySessionHandler;
+	
+	public void testDrl() {
 		InputStream template = TestService.class.getResourceAsStream("/com/siem/successful-login.drt");
         
         DataProvider dataProvider = new ArrayDataProvider(new String[][]{
@@ -53,16 +61,29 @@ public class TestService {
         });
         
         System.out.println(template);
+        System.out.println(dataProvider);
         DataProviderCompiler converter = new DataProviderCompiler();
         String drl = converter.compile(dataProvider, template);
         
         System.out.println(drl);
-        
         KieSession kieSession = createKieSessionFromDRL(drl);
-		// KieSession kieSession = kieContainer.newKieSession("SiemSession");
+	}
+	public void testIt() {
+		mySessionHandler.createNewSession();
+		KieSession kieSession = SiemApplication.allSessions.get("SiemSession");
+		System.out.println("Started with rules");
 		kieSession.insert(new Test(1L, "Ime"));
 		kieSession.insert(new ThreatDetected(1l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(2l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(3l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(4l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(5l, "ip123", new Date()));
+		kieSession.insert(new Account(1l, "username", "ip123"));
 		kieSession.insert(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123", new Date()));
+		System.out.println(kieSession.getObjects()); 
+		for (Object o: kieSession.getObjects()) {
+			System.out.println(o.toString());
+		}
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -72,18 +93,30 @@ public class TestService {
 		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
 		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
 
-		ThreatEliminated te = new ThreatEliminated(1l, "ip123", new Date());
-		te.setTimestamp(DateUtils.addHours(te.getTimestamp(), 3));
+//		ThreatEliminated te = new ThreatEliminated(1l, "ip123", new Date());
+//		te.setTimestamp(DateUtils.addHours(te.getTimestamp(), 3));
 		kieSession.insert(new ErrorLog("Some message", "ip12304109", new Date()));
-		kieSession.insert(te);
+//		kieSession.insert(te);
 		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
 		kieSession.insert(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2", new Date()));
 		kieSession.insert(new ErrorLog("message", "ip1", new Date()));
-		kieSession.fireAllRules();
-		kieSession.dispose();
 
+		kieSession.insert(new ThreatDetected(6l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(7l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(8l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(9l, "ip123", new Date()));
+		kieSession.insert(new ThreatDetected(10l, "ip123", new Date()));
+		kieSession.fireAllRules();
+
+		QueryResults queryResults = mySessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
+		System.out.println(queryResults.size());
+		for (QueryResultsRow row : queryResults) {
+			System.out.println("aaa");
+			System.out.println(((Account) row.get("account")).getIpAddress());
+		}
 		System.out.println("Done with rules");
 
+		kieSession.dispose();
 		return;
 	}
 
