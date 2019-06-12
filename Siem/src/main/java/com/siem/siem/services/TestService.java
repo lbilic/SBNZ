@@ -42,13 +42,13 @@ public class TestService {
 	private final KieContainer kieContainer;
 
 	@Autowired
+	SessionHandler sessionHandler;
+	
+	@Autowired
 	public TestService(KieContainer kieContainer) {
 		log.info("Initialising a new example session.");
 		this.kieContainer = kieContainer;
 	}
-
-	@Autowired
-	SessionHandler mySessionHandler;
 	
 	public void testDrl() {
 		InputStream template = TestService.class.getResourceAsStream("/com/siem/successful-login.drt");
@@ -69,54 +69,54 @@ public class TestService {
         KieSession kieSession = createKieSessionFromDRL(drl);
 	}
 	public void testIt() {
-		mySessionHandler.createNewSession();
+		sessionHandler.createNewSession();
 		KieSession kieSession = SiemApplication.allSessions.get("SiemSession");
 		System.out.println("Started with rules");
 		kieSession.insert(new Test(1L, "Ime"));
-		kieSession.insert(new ThreatDetected(1l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(2l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(3l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(4l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(5l, "ip123", new Date()));
-		kieSession.insert(new Account(1l, "username", "ip123"));
-		kieSession.insert(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123", new Date()));
-		System.out.println(kieSession.getObjects()); 
-		for (Object o: kieSession.getObjects()) {
-			System.out.println(o.toString());
-		}
+		sessionHandler.insertLogIntoSession(new ThreatDetected(1l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(2l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(3l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(4l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(5l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(6l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(7l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(8l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(9l, "ip123", new Date()));
+		sessionHandler.insertLogIntoSession(new ThreatDetected(10l, "ip123", new Date()));
+		sessionHandler.insertAccountIntoSession(new Account(1l, "username", "ip123"));
+		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.OS, "lemur", "ip123", new Date()));
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
+		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
+		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.IS1, "lemur", "ip1234", new Date()));
 
 //		ThreatEliminated te = new ThreatEliminated(1l, "ip123", new Date());
 //		te.setTimestamp(DateUtils.addHours(te.getTimestamp(), 3));
-		kieSession.insert(new ErrorLog("Some message", "ip12304109", new Date()));
+		sessionHandler.insertLogIntoSession(new ErrorLog("Some message", "ip12304109", new Date()));
 //		kieSession.insert(te);
-		kieSession.insert(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
-		kieSession.insert(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2", new Date()));
-		kieSession.insert(new ErrorLog("message", "ip1", new Date()));
+		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "lemur12", "ip2", new Date()));
+		sessionHandler.insertLogIntoSession(new ErrorLog("message", "ip1", new Date()));
 
-		kieSession.insert(new ThreatDetected(6l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(7l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(8l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(9l, "ip123", new Date()));
-		kieSession.insert(new ThreatDetected(10l, "ip123", new Date()));
 		kieSession.fireAllRules();
 
-		QueryResults queryResults = mySessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
+		QueryResults queryResults = sessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
 		System.out.println(queryResults.size());
 		for (QueryResultsRow row : queryResults) {
-			System.out.println("aaa");
 			System.out.println(((Account) row.get("account")).getIpAddress());
+		}
+		queryResults = sessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
+		
+		
+		for(Object o : kieSession.getObjects()) {
+			System.out.println(o.toString());
 		}
 		System.out.println("Done with rules");
 
-		kieSession.dispose();
 		return;
 	}
 

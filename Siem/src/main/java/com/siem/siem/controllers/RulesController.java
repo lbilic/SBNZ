@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.siem.siem.dto.RuleDTO;
+import com.siem.siem.facts.Log;
+import com.siem.siem.model.Account;
+import com.siem.siem.services.LogsService;
 import com.siem.siem.services.TestService;
 
 @RestController
@@ -26,9 +29,23 @@ public class RulesController {
 	@Autowired
 	private TestService testService;
 	
+	@Autowired
+	private LogsService logsService;
+	
 	@RequestMapping(method= RequestMethod.POST, value = "/generate-rule", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void generateRule(@RequestBody RuleDTO rule) {
     	System.out.println(rule.rule);
     }
+	
+	@RequestMapping(method= RequestMethod.POST, value = "/insert-log", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void insertLog(@RequestBody Log log) {
+		logsService.insertLog(log);
+    }
+	
+	@RequestMapping(method= RequestMethod.POST, value = "/insert-account", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void insertAccount(@RequestBody Account account) {
+		logsService.insertAccount(account);
+    }
+
 
 }

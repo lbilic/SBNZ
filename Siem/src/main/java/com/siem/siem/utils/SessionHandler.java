@@ -24,6 +24,9 @@ public class SessionHandler {
 	
 	
 	public void createNewSession() {
+		if(SiemApplication.allSessions.get("SiemSession") != null) {
+			return;
+		}
 		KieSession kieSession = kieContainer.newKieSession("SiemSession");
 		addUsersToSession(kieSession);
 		addDatesToSession(kieSession);
@@ -51,6 +54,10 @@ public class SessionHandler {
 	}
 	
 	public FactHandle insertLogIntoSession(Log object) {
+		return SiemApplication.allSessions.get("SiemSession").insert(object);
+	}
+	
+	public FactHandle insertAccountIntoSession(Account object) {
 		return SiemApplication.allSessions.get("SiemSession").insert(object);
 	}
 	
