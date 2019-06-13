@@ -35,7 +35,13 @@ public class LogsService {
 		return sessionHandler.getAllLogs();
 	}
 	
+	public Collection<? extends Object> getAlarms() {
+		sessionHandler.createNewSession();
+		return sessionHandler.getAllAlarms();
+	}
+	
 	public ArrayList<Account> getAccountWithTenVirusAlarms() {
+		sessionHandler.createNewSession();
 		QueryResults queryResults = sessionHandler.getQueryResultsForQuery("account with 10 antivirus alarms in 10 days");
 		ArrayList<Account> accounts = new ArrayList<Account>();
 		for (QueryResultsRow row : queryResults) {
@@ -45,6 +51,7 @@ public class LogsService {
 	}
 	
 	public ArrayList<Account> getAccountWithNFailedLogins(int number) {
+		sessionHandler.createNewSession();
 		QueryResults queryResults = sessionHandler.getQueryResultsForQueryParameter("account with N failed logins", String.valueOf(number));
 		ArrayList<Account> accounts = new ArrayList<Account>();
 		for (QueryResultsRow row : queryResults) {

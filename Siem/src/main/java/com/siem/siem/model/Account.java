@@ -17,14 +17,26 @@ public class Account {
 	@Column(name = "username", unique = true)
 	protected String username;
 	
-	@Column(name = "ipAddress", unique = true)
+	@Column(name = "ipAddress")
 	protected String ipAddress;
+	
+	@Column(name = "riskLevel")
+	protected AccountRiskLevel riskLevel;
 	
 	public Account(Long id, String username, String ipAddress) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.ipAddress = ipAddress;
+		this.riskLevel = riskLevel.LOW;
+	}
+	
+	public Account(Long id, String username, String ipAddress, AccountRiskLevel riskLevel) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.ipAddress = ipAddress;
+		this.riskLevel = riskLevel;
 	}
 
 	public Account() {
@@ -45,6 +57,12 @@ public class Account {
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
 	}
-	
-	
+
+	public AccountRiskLevel getRiskLevel() {
+		return riskLevel;
+	}
+
+	public void setRiskLevel(AccountRiskLevel riskLevel) {
+		this.riskLevel = riskLevel;
+	}
 }

@@ -1,5 +1,6 @@
 package com.siem.siem.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -71,7 +72,25 @@ public class SessionHandler {
 	}
 	
 	public Collection<? extends Object> getAllLogs() {
-		return SiemApplication.allSessions.get("SiemSession").getObjects();
+		ArrayList<Object> allLogs = new ArrayList<Object>();
+		for(Object o : SiemApplication.allSessions.get("SiemSession").getObjects()) {
+			
+			if (o instanceof Log) {
+				allLogs.add(o);
+			}
+		};
+		return allLogs;
+	}
+	
+	public Collection<? extends Object> getAllAlarms() {
+		ArrayList<Object> allAlarms = new ArrayList<Object>();
+		for(Object o : SiemApplication.allSessions.get("SiemSession").getObjects()) {
+			
+			if (!(o instanceof Log) && !(o instanceof Account)) {
+				allAlarms.add(o);
+			}
+		};
+		return allAlarms;
 	}
 
 }

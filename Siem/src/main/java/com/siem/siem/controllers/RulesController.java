@@ -54,6 +54,11 @@ public class RulesController {
 		return logsService.getLogs();
     }
 	
+	@RequestMapping(method= RequestMethod.GET, value = "/alarms")
+    public Collection<? extends Object> getAlarms() {
+		return logsService.getAlarms();
+    }
+	
 	@RequestMapping(method= RequestMethod.GET, value = "/accounts-with-antivirus-alarms")
     public ArrayList<Account> getAccountsWithAlarms() {
 		return logsService.getAccountWithTenVirusAlarms();
@@ -63,5 +68,10 @@ public class RulesController {
     public Collection<? extends Object> getAccountWithNFailedLogins(@RequestParam int number) {
 		return logsService.getAccountWithNFailedLogins(number);
     }
+	
+//	@RequestMapping(method= RequestMethod.GET, value = "/accounts-with-failed-logins")
+//    public Collection<? extends Object> getAccountWithNFailedLogins(@RequestParam int number) {
+//		return logsService.getAccountWithNFailedLogins(number);
+//    }
 
 }
