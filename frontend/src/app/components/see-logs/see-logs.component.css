@@ -18,3 +18,9 @@ table {
   font-size: 14px;
   width: 100%;
 }
+
+.regex-checkbox {
+  padding-top:13px;
+  margin-left: 0px;
+  padding-left: 0px;
+}
