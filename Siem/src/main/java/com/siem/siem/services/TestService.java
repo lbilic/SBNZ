@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import com.siem.siem.SiemApplication;
 import com.siem.siem.facts.ErrorLog;
 import com.siem.siem.facts.FailedLogin;
+import com.siem.siem.facts.Log;
+import com.siem.siem.facts.MaliciousIps;
 import com.siem.siem.facts.ProfileChange;
 import com.siem.siem.facts.SuccessfulLogin;
 import com.siem.siem.facts.SystemTypes;
@@ -103,7 +105,10 @@ public class TestService {
 		sessionHandler.insertLogIntoSession(new SuccessfulLogin(SystemTypes.IS2, "lemur1", "ip1", new Date()));
 		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip2", new Date()));
 		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip3", new Date()));
-		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip4", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip34", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip34", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip34", new Date()));
+		sessionHandler.insertLogIntoSession(new FailedLogin(SystemTypes.IS2, "username", "ip34", new Date()));
 		sessionHandler.insertLogIntoSession(new ErrorLog("message", "ip1", new Date()));
 
 		kieSession.fireAllRules();
@@ -113,11 +118,25 @@ public class TestService {
 		for (QueryResultsRow row : queryResults) {
 			System.out.println(((Account) row.get("account")).getIpAddress());
 		}
-		queryResults = sessionHandler.getQueryResultsForQueryParameter("account with N failed logins", "5");
+		queryResults = sessionHandler.getQueryResultsForQueryParameter("account with N failed logins", "3");
 		System.out.println(queryResults.size());
 		for (QueryResultsRow row : queryResults) {
 			System.out.println(((Account) row.get("account")).getIpAddress());
 		}
+		
+//		queryResults = sessionHandler.getQueryResultsForQuery("account with 6 alarms");
+//		System.out.println(queryResults.size());
+//		for (QueryResultsRow row : queryResults) {
+//			System.out.println((row.get("alarms1")).toString());
+//		}
+		
+		for(Object o :kieSession.getObjects()) {
+			
+			if (o instanceof Log) {
+				System.out.println((o.toString()));
+			}
+		};
+		System.out.println(MaliciousIps.maliciousIps);
 		System.out.println("Done with rules");
 
 		return;
