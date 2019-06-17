@@ -13,6 +13,7 @@ import com.siem.siem.events.ProfileChangedAfterFailedLoginEvent;
 import com.siem.siem.events.MultipleThreatsDetectedEvent;
 import com.siem.siem.events.MaliciousIpLoginSuccess;
 import com.siem.siem.events.MaliciousIpLoginFailed;
+
 import java.util.List;
 
 declare SuccessfulLogin
@@ -46,6 +47,23 @@ rule "Logging into same account on different system within 10 seconds"
         )
     then
         System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
+		insert(new FailedLoginSameUsernameEvent($sl1.getUsername(), "Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated"));
+end
+
+rule "Multiple failed logins from same IP"
+    when
+    	$fl: FailedLogin($ipAddress: ipAddress)
+        $list: ArrayList(size >= 3) from collect(FailedLogin(ipAddress == $ipAddress) over window:time(1d))
+    then
+        System.out.println($list.size() + " neuspesnih loginova sa iste masine u poslednjih 24h");
+        for(String s : MaliciousIps.maliciousIps) {
+        	if(s.equals($ipAddress)) {
+        	System.out.println("nasao");
+        		return;
+        	}
+        }
+        
+		MaliciousIps.maliciousIps.add($ipAddress);
 end
 
 rule "Threat not beeing removed withing 1 hour"
@@ -115,7 +133,7 @@ end
 
 rule "10 threats detected on same ip"
 	when
-		ThreatDetected( $ip : ipAddress)
+		account : Account( $ip : ipAddress)
 		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
 	then
 		System.out.println("Ip address with high risk detected");

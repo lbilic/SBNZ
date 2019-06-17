@@ -2,7 +2,7 @@ package com.siem.siem.facts;
 
 import java.util.ArrayList;
 
-public class MaliciousIps {
+public class MaliciousIps extends Log {
 
 	public static ArrayList<String> maliciousIps = new ArrayList<String>(){{
 	    add("ip1");

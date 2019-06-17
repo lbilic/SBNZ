@@ -1,0 +1,81 @@
+<div class="container" style="text-align: center;">
+  <div class="row" style="display: block; text-align: center">
+    <h1>New log:</h1>
+  </div>
+  <div class="row" style="display: inline-block; width:100%">
+    <form class="rule-form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <!--input matInput placeholder="Rule" formControlName="rule" id="rule"-->
+          <mat-label>Log</mat-label>
+          <mat-select formControlName="log" [(value)]="logType">
+            <mat-option *ngFor="let log of logs" [value]="log">
+              {{log}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType != 'MaliciousIps'" class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="IP Address" formControlName="ipAddress" id="ipAddress" type="text">
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType == 'ErrorLog'" class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Message" formControlName="message" id="message" type="text">
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType == 'FailedLogin' || logType == 'SuccessfulLogin' || logType == 'ProfileChange'" class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <mat-label>System Type</mat-label>
+          <mat-select formControlName="systemType">
+            <mat-option *ngFor="let systemType of systemTypes" [value]="systemType">
+              {{systemType}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType == 'FailedLogin' || logType == 'SuccessfulLogin' || logType == 'ProfileChange'" class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Username" formControlName="username" id="username" type="text">
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType == 'ThreatDetected' || logType == 'ThreatEliminated'" class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Threat ID" formControlName="threatId" id="threatId" type="text">
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="logType == 'MaliciousIps'" class="col-4" style="float: left;">
+        <mat-form-field class="input-half-width" style="float:left">
+          <input matInput placeholder="Malicious IP" formControlName="maliciousIp" id="maliciousIp" type="text">
+        </mat-form-field>
+        <button mat-flat-button color="primary" type='button' (click)="addIp()" style="float: left; margin-top:10px;">Add IP</button>
+      </div>
+
+      <div *ngIf="logType == 'MaliciousIps'" class="col-2" style="float: left;">
+          <mat-list style="float: left;">
+            <h3 mat-subheader>Malicious IPs</h3>
+            <mat-list-item *ngFor="let ip of maliciousIps">
+              <h4 mat-line>{{ip}}</h4>
+            </mat-list-item>
+          </mat-list>
+      </div>
+
+      <div *ngIf="logType != 'MaliciousIps'" class="col-2" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Value" formControlName="value" id="value" type="number" value=1>
+        </mat-form-field>
+      </div>
+
+      <div class="col-2" style="float: left;">
+          <button mat-flat-button color="primary" type='submit' style="margin-top:5px">Send log</button>
+      </div>
+    </form>
+  </div>
+</div>

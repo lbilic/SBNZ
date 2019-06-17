@@ -1,0 +1,46 @@
+<div class="container" style="text-align: center;">
+  <div class="row" style="display: block; text-align: center">
+    <h1>Filter logs:</h1>
+  </div>
+  <div class="row" style="display: inline-block">
+    <form class="rule-form" [formGroup]="myForm" (ngSubmit)="submit()">
+      <div class="col-10" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <!--input matInput placeholder="Rule" formControlName="rule" id="rule"-->
+          <mat-label>Log</mat-label>
+          <mat-select formControlName="log">
+            <mat-option *ngFor="let log of logs" [value]="log">
+              {{log}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!--div class="col-4" style="float: left;">
+        <mat-form-field class="input-full-width">
+          <input matInput placeholder="Sender" formControlName="sender" id="sender" type="text">
+        </mat-form-field>
+      </div-->
+
+      <div class="col-2" style="float: left;">
+          <button mat-flat-button color="primary" type='submit'>Filter logs</button>
+      </div>
+    </form>
+  </div>
+
+
+  <table mdbTable>
+      <thead>
+        <tr>
+          <th *ngFor="let name of colNames" scope="col">{{name}} </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr mdbTableCol *ngFor="let el of tempLogs">
+          <th scope="row">{{el.logType}}</th>
+          <td>{{el.ipAddress}}</td>
+          <td>{{el.timestamp}}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>

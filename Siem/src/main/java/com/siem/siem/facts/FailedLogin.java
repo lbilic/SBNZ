@@ -10,12 +10,15 @@ public class FailedLogin extends Log implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public FailedLogin() {}
+    public FailedLogin() {
+    	super.setLogType("FailedLogin");
+    }
     
     public FailedLogin(SystemTypes systemTypes, String name, String ip, Date timestemp) {
-		super(ip, timestemp);
+		super(ip, timestemp);	
 		this.systemType = systemTypes;
 		this.username = name;
+		super.setLogType("FailedLogin");
 	}
 
 	public SystemTypes getSystemType() {
@@ -59,4 +62,11 @@ public class FailedLogin extends Log implements Serializable {
         }
         return true;
     }
+
+	@Override
+	public String toString() {
+		return "FailedLogin [ipAddress=" + super.getIpAddress() + ", timestamp=" + super.getTimestamp() + ", systemType= " + systemType + ", username=" + username + "]";
+	}
+    
+    
 }

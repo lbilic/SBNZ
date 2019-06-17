@@ -5,12 +5,16 @@ import java.util.Date;
 public class Log {
 	private String ipAddress;
     private Date timestamp;
+    private String logType;
     
-    public Log() {}
+    public Log() {
+    	this.logType = "Log";
+    }
   
     public Log(String ip, Date timestamp ) {
 		this.ipAddress = ip;
 		this.timestamp = timestamp;
+		this.logType = "Log";
 	}
 
 	public String getIpAddress() {
@@ -29,10 +33,18 @@ public class Log {
 		this.timestamp = timestamp;
 	}
 
-	@Override
+	public String getLogType() {
+		return logType;
+	}
+
+	public void setLogType(String logType) {
+		this.logType = logType;
+	}
+	
+	/*@Override
 	public String toString() {
 		return "Log [ipAddress=" + ipAddress + ", timestamp=" + timestamp + "]";
-	}
+	}*/
     
     
 

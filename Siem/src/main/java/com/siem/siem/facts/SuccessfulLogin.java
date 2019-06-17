@@ -6,12 +6,15 @@ public class SuccessfulLogin extends Log {
 	private SystemTypes systemType;
     private String username;
     
-    public SuccessfulLogin() {}
+    public SuccessfulLogin() {
+    	super.setLogType("SuccessfulLogin");
+    }
     
     public SuccessfulLogin(SystemTypes systemTypes, String name, String ip, Date timestemp) {
 		super(ip, timestemp);
 		this.systemType = systemTypes;
 		this.username = name;
+		super.setLogType("SuccessfulLogin");
 	}
 
 	public SystemTypes getSystemType() {

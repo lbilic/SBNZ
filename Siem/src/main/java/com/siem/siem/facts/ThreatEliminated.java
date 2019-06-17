@@ -5,11 +5,14 @@ import java.util.Date;
 public class ThreatEliminated extends Log {
 	private Long threatId;
    
-    public ThreatEliminated() {}
+    public ThreatEliminated() {
+    	super.setLogType("ThreatEliminated");
+    }
     
     public ThreatEliminated(Long threatId, String ip, Date timestemp) {
 		super(ip, timestemp);
 		this.threatId = threatId;
+		super.setLogType("ThreatEliminated");
 	}
 
 	public Long getThreatId() {
