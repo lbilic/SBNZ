@@ -1,0 +1,17 @@
+<div class="container" style="text-align: center;">
+    <h2>Alarms</h2>
+    <table class="table" mdbTable>
+        <thead>
+          <tr>
+            <th style="width:50%;" scope="col">Identifier</th>
+            <th style="width:50%;" scope="col">Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr mdbTableCol *ngFor="let el of alarms">
+            <td style="width:50%;" scope="row">{{el?.ipAddress || el?.username}}</td>
+            <td style="width:50%;" scope="row">{{el?.message}}</td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
