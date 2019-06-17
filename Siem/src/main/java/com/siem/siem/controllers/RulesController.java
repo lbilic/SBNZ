@@ -56,11 +56,12 @@ public class RulesController {
 		}
 		
 		try{
-			String path = new File("../siem-rules/install.bat").getCanonicalPath();
-			String pathToFolder = path.substring(0, path.length()-11);
-			path = "start " + path;
-			path = String.format("cmd /c cd \"%s\" && ", pathToFolder) + path;
-		    Process p = Runtime.getRuntime().exec(path);
+			String path1 = new File("../siem-rules/install.sh").getCanonicalPath();
+			String pathToFolder = path1.substring(0, path1.length()-11);
+			String path = "start " + path1;
+			path = String.format("/bin/bash -c cd \"%s\" && ", pathToFolder) + path;
+			System.out.println(path);
+		    Process p =new ProcessBuilder("/bin/bash", path1).start();
 		    //p.waitFor();
 
 		}catch( IOException ex ){
