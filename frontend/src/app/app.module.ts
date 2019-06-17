@@ -7,7 +7,7 @@ import { AddRuleComponent } from './components/add-rule/add-rule.component';
 import { SeeLogsComponent } from './components/see-logs/see-logs.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 
-import { MatFormFieldModule, MatOptionModule, MatSelectModule, MatInputModule, MatButtonModule } from '@angular/material';
+import { MatFormFieldModule, MatOptionModule, MatSelectModule, MatInputModule, MatButtonModule, MatCheckboxModule } from '@angular/material';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -42,7 +42,8 @@ import { CustomRuleComponent } from './components/custom-rule/custom-rule.compon
     MatSelectModule,
     MatExpansionModule,
     MatListModule,
-    MatTableModule
+    MatTableModule,
+    MatCheckboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]
