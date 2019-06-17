@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="row">
+    <h1>Find users</h1>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button mat-flat-button color="primary" (click)="showUsersWithAntivirus()">Show users with at least 10 antivirus alarms in 10 days</button>
+    </div>
+    <div class="col">
+      Users with Failed Logins from different ips
+      <form>
+        <mat-form-field class="example-full-width">
+          <input #numberInput matInput placeholder="Enter number of different ips" id="failedLoginsIps">
+        </mat-form-field>
+      </form>
+      <button mat-flat-button color="primary" (click)="showUsersFailedLogins(numberInput.value)">Show users</button>
+    </div>
+  </div>
+
+  <table class="table" mdbTable>
+      <thead>
+        <tr>
+          <th *ngFor="let name of colNames" scope="col">{{name}} </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr mdbTableCol *ngFor="let el of results">
+          <th scope="row">{{el?.username}}</th>
+          <td>{{el?.ipAddress}}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
