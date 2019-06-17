@@ -16,6 +16,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list'; 
 import { MatTableModule } from '@angular/material/table';
 import { AlarmsComponent } from './components/alarms/alarms.component';
+import { CustomRuleComponent } from './components/custom-rule/custom-rule.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { AlarmsComponent } from './components/alarms/alarms.component';
     AddRuleComponent,
     SeeLogsComponent,
     NavbarComponent,
-    AlarmsComponent
+    AlarmsComponent,
+    CustomRuleComponent
   ],
   imports: [
     BrowserModule,

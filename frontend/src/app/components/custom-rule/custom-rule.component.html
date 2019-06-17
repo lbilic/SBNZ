@@ -1,0 +1,12 @@
+<div class="container">
+  <form class="container" [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field>
+        <input matInput placeholder="Rule name" value="" formControlName="ruleName">
+    </mat-form-field>
+    <mat-form-field>
+      <textarea id="textbox" matInput placeholder="Custom rule" matTextareaAutosize formControlName="rule"></textarea>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" type='submit'>Submit</button>
+  </form>
+</div>

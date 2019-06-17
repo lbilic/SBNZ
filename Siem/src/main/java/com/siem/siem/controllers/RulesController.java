@@ -1,8 +1,14 @@
 package com.siem.siem.controllers;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.json.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +45,29 @@ public class RulesController {
 	@RequestMapping(method = RequestMethod.POST, value = "/generate-rule", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void generateRule(@RequestBody RuleDTO rule) {
 		System.out.println(rule.rule);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/generate-custom-rule/{ruleName}", consumes = MediaType.TEXT_PLAIN_VALUE)
+	public void generateCustomRule(@RequestBody String rule, @PathVariable String ruleName) {
+		try (PrintWriter out = new PrintWriter("../siem-rules/src/main/resources/com/siem/" + ruleName + ".drl")) {
+			out.println(rule);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		try{
+			String path = new File("../siem-rules/install.bat").getCanonicalPath();
+			String pathToFolder = path.substring(0, path.length()-11);
+			path = "start " + path;
+			path = String.format("cmd /c cd \"%s\" && ", pathToFolder) + path;
+		    Process p = Runtime.getRuntime().exec(path);
+		    //p.waitFor();
+
+		}catch( IOException ex ){
+		    ex.printStackTrace();
+		}/*catch( InterruptedException ex ){
+			ex.printStackTrace();
+		}*/
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/insert-log/{logType}", consumes = MediaType.APPLICATION_JSON_VALUE)

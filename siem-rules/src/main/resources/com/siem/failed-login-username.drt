@@ -1,0 +1,23 @@
+template header
+interval
+size
+
+import com.siem.siem.facts.FailedLogin;
+
+template "login-same-username-rules"
+
+declare FailedLogin
+		@role(event)
+end
+rule "Multiple failed logins with the same username"
+    when
+        $fl1: FailedLogin()
+        $list: ArrayList(size > @{size}) from collect(FailedLogin(username == $fl1.getUsername(), 
+        					((timestamp.getTime()-$fl1.getTimestamp().getTime())/1000) > 0,
+							((timestamp.getTime()-$fl1.getTimestamp().getTime())/1000) < @{interval}))
+    then
+        System.out.println($list.size() + " neuspesnih loginova sa istim username-om u poslednjih @{interval}s");
+		insert(new FailedLoginSameUsernameEvent($fl1.getIpAddress(), "Multiple failed logins with the same username"));
+end
+
+end template

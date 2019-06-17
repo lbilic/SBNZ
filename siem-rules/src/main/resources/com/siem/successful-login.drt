@@ -7,7 +7,6 @@ import com.siem.siem.facts.SuccessfulLogin;
 
 template "successful-login-rules"
 
-
 declare SuccessfulLogin
 	@role(event)
 end

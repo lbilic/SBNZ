@@ -1,0 +1,22 @@
+template header
+interval
+size
+
+import com.siem.siem.facts.FailedLogin;
+
+template "login-same-machine-rules"
+
+declare FailedLogin
+		@role(event)
+end
+rule "Multiple failed logins on the same machine"
+    when
+    	$fl: FailedLogin($ipAddress: ipAddress, $timestamp: timestamp)
+    	not FailedLogin(ipAddress == $ipAddress, this before $fl)
+        $list: ArrayList(size >= @{size}) from collect(FailedLogin(ipAddress == $ipAddress, ((new Date()).getTime() - $fl.getTimestamp().getTime()) / (1000) < @{interval}))
+    then
+        System.out.println($list.size() + " neuspesnih loginova sa iste masine u poslednjih @{interval}s");
+		insert(new FailedLoginSameSystemEvent( $fl.getIpAddress(), "Multiple failed logins on the same machine"));
+end
+
+end template

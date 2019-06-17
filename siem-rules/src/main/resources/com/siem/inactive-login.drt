@@ -1,0 +1,25 @@
+template header
+days
+
+package com.siem;
+
+import com.siem.siem.facts.SuccessfulLogin;
+
+template "inactive-login-rules"
+
+
+declare SuccessfulLogin
+	@role(event)
+end
+
+rule "Inactive account login after @{days}"
+    when
+    	$sl1: SuccessfulLogin()
+        $sl2: SuccessfulLogin( username == $sl1.getUsername(), ((new Date()).getTime() - $sl1.getTimestamp().getTime()) / (24 * 60 * 60 * 1000) > @{days} )
+    then
+        System.out.println("Login na nalog koji je bio neaktivan @{days} ili vise dana!");
+		insert(new InactiveAccountLoginEvent($sl1.getUsername(), "Inactive account login"));
+        drools.halt();
+end
+
+end template

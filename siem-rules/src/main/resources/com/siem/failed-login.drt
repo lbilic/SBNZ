@@ -1,0 +1,22 @@
+template header
+interval
+size
+
+import com.siem.siem.facts.FailedLogin;
+
+template "login-same-ip-rules"
+
+declare FailedLogin
+		@role(event)
+end
+rule "Multiple unique failed logins from the same ip address"
+    when
+    	$fl: FailedLogin($ipAddress: ipAddress, $timestamp: timestamp)
+    	not FailedLogin(ipAddress == $ipAddress, this before $fl)
+        $list: ArrayList(size >= @{size}) from collect(FailedLogin(systemType != $fl.getSystemType(), this == $fl, ipAddress == $ipAddress, ((new Date()).getTime() - $fl.getTimestamp().getTime) / (24 * 60 * 60 * 1000) < @{interval}))
+    then
+        System.out.println($list.size() + " failed logins from " + $ipAddress);
+        insert(new MultipleFailedLoginsSameIpAddressEvent($fl.getIpAddress(), "Multiple unique failed logins from the same ip address"));
+end
+
+end template
