@@ -1,0 +1,54 @@
+<div style="margin-top: 50px;">
+  <table class="table" mdbTable style="text-align: center">
+    <thead>
+      <tr>
+        <th><h1>Start Date:</h1></th>
+        <th><h1>End date:</h1></th>
+      </tr>
+    </thead>
+    <tr>
+      <td>
+        <mat-form-field>
+          <input matInput [matDatepicker]="startPicker" placeholder="Choose a start date" [(ngModel)]="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+      </td>
+      
+      <td>
+        <mat-form-field>
+          <input matInput [matDatepicker]="endPicker" placeholder="Choose an end date" [(ngModel)]="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=2>
+        <button mat-flat-button color="primary" type='button' (click)="submit()">Report</button>
+      </td>
+    </tr>
+  </table>
+  
+  <table class="table" mdbTable>
+      <thead>
+        <tr>
+          <th *ngFor="let name of colNames" scope="col">{{name}} </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr mdbTableCol>
+          <td>{{OSL}}</td>
+          <td>{{IS1L}}</td>
+          <td>{{IS2L}}</td>
+          <td>{{PSL}}</td>
+          <td>{{OSA}}</td>
+          <td>{{IS1A}}</td>
+          <td>{{IS2A}}</td>
+          <td>{{PSA}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  

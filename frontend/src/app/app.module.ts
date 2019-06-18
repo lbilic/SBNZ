@@ -6,8 +6,9 @@ import { AppComponent } from './app.component';
 import { AddRuleComponent } from './components/add-rule/add-rule.component';
 import { SeeLogsComponent } from './components/see-logs/see-logs.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { MatDatepickerModule } from '@angular/material/datepicker'; 
 
-import { MatFormFieldModule, MatOptionModule, MatSelectModule, MatInputModule, MatButtonModule, MatCheckboxModule } from '@angular/material';
+import { MatFormFieldModule, MatOptionModule, MatSelectModule, MatInputModule, MatButtonModule, MatCheckboxModule, MatNativeDateModule } from '@angular/material';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,6 +19,7 @@ import { MatTableModule } from '@angular/material/table';
 import { AlarmsComponent } from './components/alarms/alarms.component';
 import { CustomRuleComponent } from './components/custom-rule/custom-rule.component';
 import { FindUsersComponent } from './components/find-users/find-users.component';
+import { ReportComponent } from './components/report/report.component';
 
 
 @NgModule({
@@ -28,7 +30,8 @@ import { FindUsersComponent } from './components/find-users/find-users.component
     NavbarComponent,
     AlarmsComponent,
     CustomRuleComponent,
-    FindUsersComponent
+    FindUsersComponent,
+    ReportComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +48,9 @@ import { FindUsersComponent } from './components/find-users/find-users.component
     MatExpansionModule,
     MatListModule,
     MatTableModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   providers: [],
   bootstrap: [AppComponent]
