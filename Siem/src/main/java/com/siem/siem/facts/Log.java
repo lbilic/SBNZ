@@ -6,6 +6,7 @@ public class Log {
 	private String ipAddress;
     private Date timestamp;
     private String logType;
+    private boolean fired;
     
     public Log() {
     	this.logType = "Log";
@@ -15,6 +16,7 @@ public class Log {
 		this.ipAddress = ip;
 		this.timestamp = timestamp;
 		this.logType = "Log";
+		this.fired = false;
 	}
 
 	public String getIpAddress() {
@@ -39,6 +41,14 @@ public class Log {
 
 	public void setLogType(String logType) {
 		this.logType = logType;
+	}
+
+	public boolean isFired() {
+		return fired;
+	}
+
+	public void setFired(boolean fired) {
+		this.fired = fired;
 	}
 	
 	/*@Override

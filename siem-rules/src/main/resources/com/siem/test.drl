@@ -134,9 +134,13 @@ end
 rule "10 threats detected on same ip"
 	when
 		account : Account( $ip : ipAddress)
-		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
+		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip , fired != true ) over window:time(10d))
 	then
 		System.out.println("Ip address with high risk detected");
+		for(Object l:$list){
+			System.out.println(l);
+			modify ((Log)l) { setFired(true); }	
+		};
 		insert(new MultipleThreatsDetectedEvent($ip, "Ip address with high risk detected"));
 end
 

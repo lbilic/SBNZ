@@ -54,7 +54,7 @@ public class MainController {
 
     @RequestMapping(value = "/test_dos", method = RequestMethod.GET)
     public String testDos() {
-    	testService.testDOS();
+    	testService.testDrl();
         return "Dos test done";
     }
 

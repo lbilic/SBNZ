@@ -53,22 +53,8 @@ public class TestService {
 	}
 	
 	public void testDrl() {
-		InputStream template = TestService.class.getResourceAsStream("/com/siem/successful-login.drt");
-        
-        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
-            new String[]{"18"},
-            new String[]{"22"},
-            new String[]{"31"},
-            new String[]{"41"}
-        });
-        
-        System.out.println(template);
-        System.out.println(dataProvider);
-        DataProviderCompiler converter = new DataProviderCompiler();
-        String drl = converter.compile(dataProvider, template);
-        
-        System.out.println(drl);
-        KieSession kieSession = createKieSessionFromDRL(drl);
+		KieSession kieSession = SiemApplication.allSessions.get("SiemSession");
+		kieSession.fireAllRules();
 	}
 	public void testIt() {
 		sessionHandler.createNewSession();
