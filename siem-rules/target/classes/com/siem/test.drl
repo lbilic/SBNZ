@@ -13,8 +13,10 @@ import com.siem.siem.events.ProfileChangedAfterFailedLoginEvent;
 import com.siem.siem.events.MultipleThreatsDetectedEvent;
 import com.siem.siem.events.MaliciousIpLoginSuccess;
 import com.siem.siem.events.MaliciousIpLoginFailed;
+import com.siem.siem.events.FailedLoginSameUsernameEvent;
 
 import java.util.List;
+import java.util.ArrayList;
 
 declare SuccessfulLogin
 	@role(event)
@@ -34,26 +36,26 @@ end
 
 rule "Logging into same account on different system within 10 seconds"
     when
-        $sl1: SuccessfulLogin($username : username, $systemType: systemType, $ipAddress: ipAddress)
-         Number(intValue >= 1) from accumulate(
-            $t2: SuccessfulLogin(
-                this != $sl1, 
-                username == $username, 
-                systemType == $systemType,
-                ipAddress == $ipAddress,
-                this meets[10s] $sl1
-            ),
-            count($t2)
-        )
+        $sl1: SuccessfulLogin($username : username, $systemType: systemType, $ipAddress: ipAddress, fired != true)
+	    Number(intValue >= 1) from accumulate($sl2: SuccessfulLogin(
+	            this != $sl1, 
+	            username == $username, 
+	            systemType == $systemType,
+	            ipAddress == $ipAddress,
+	            this meets[10s] $sl1
+	        ),
+	        count($sl2)
+	    )
     then
         System.out.println("Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated");
+		modify ((Log)$sl1) { setFired(true); }	
 		insert(new FailedLoginSameUsernameEvent($sl1.getUsername(), "Logging into same account(" + $sl1.getUsername() + ") on different system within 10 sec activated"));
 end
 
 rule "Multiple failed logins from same IP"
     when
     	$fl: FailedLogin($ipAddress: ipAddress)
-        $list: ArrayList(size >= 3) from collect(FailedLogin(ipAddress == $ipAddress) over window:time(1d))
+        $list: ArrayList(size >= 3) from collect(FailedLogin(ipAddress == $ipAddress, fired != true) over window:time(1d))
     then
         System.out.println($list.size() + " neuspesnih loginova sa iste masine u poslednjih 24h");
         for(String s : MaliciousIps.maliciousIps) {
@@ -62,81 +64,103 @@ rule "Multiple failed logins from same IP"
         		return;
         	}
         }
+        for(Object l:$list){
+			System.out.println(l);
+			modify ((Log)l) { setFired(true); }	
+		};
         
 		MaliciousIps.maliciousIps.add($ipAddress);
 end
 
 rule "Threat not beeing removed withing 1 hour"
     when
-    	$td : ThreatDetected($id : threatId, $ip : ipAddress)
+    	$td : ThreatDetected($id : threatId, $ip : ipAddress, fired != true)
     	not($te : ThreatEliminated( threatId == $id, ipAddress == $ip,
     								 this meets[1h] $td))
     	$te : ThreatEliminated()
     then
         System.out.println("Threat was not eliminated within 1 hour");
+		modify ((Log)$td) { setFired(true); }	
         insert(new ThreatNotRemovedEvent($td.getThreatId(), "Threat was not eliminated within 1 hour"));
 end
 
 rule "Error log detected"
 	when
-		$el : ErrorLog()
+		$el : ErrorLog(fired != true)
 	then
+		modify ((Log)$el) { setFired(true); }
 		System.out.println("Error log detected");
 end
 
 rule "Log detected"
 	when
-		$list : List(size>0) from collect($log: Log())
+		$list : List(size>0) from collect($log: Log(fired != true))
 	then
+		for(Object l:$list){
+			System.out.println(l);
+			modify ((Log)l) { setFired(true); }	
+		};
 		System.out.println("List ->" + $list.size());
 end
 
 rule "Malicious ip detected in successful login"
 	when
-		$sl1: SuccessfulLogin(MaliciousIps.maliciousIps contains ipAddress)
+		$sl1: SuccessfulLogin(MaliciousIps.maliciousIps contains ipAddress, fired != true)
 	then
 		System.out.println("Malicious ip detected in successful login");
+		modify ((Log)$sl1) { setFired(true); }
 		insert(new MaliciousIpLoginSuccess($sl1.getIpAddress(), "Malicious ip detected in successful login"));
 end
 
 rule "Malicious ip detected in failed login"
 	when
-		$sl1: FailedLogin(MaliciousIps.maliciousIps contains ipAddress)
+		$sl1: FailedLogin(MaliciousIps.maliciousIps contains ipAddress, fired != true)
 	then
 		System.out.println("Malicious ip detected in failed login");
+		modify ((Log)$sl1) { setFired(true); }
 		insert(new MaliciousIpLoginFailed($sl1.getIpAddress(), "Malicious ip detected in failed login"));
 end
 
 rule "Malicious ip detected in log"
 	when
-		$sl1: Log(MaliciousIps.maliciousIps contains ipAddress)
+		$sl1: Log(MaliciousIps.maliciousIps contains ipAddress, fired != true)
 	then
+		modify ((Log)$sl1) { setFired(true); }
 		System.out.println("Malicious ip detected in log");
 end
 
 rule "DOS - Brute-force alarm"
 	when
-		$list: List(size>10) from collect( FailedLogin() over window:time(10s))
+		$list: List(size>10) from collect( FailedLogin(fired != true) over window:time(10s))
 	then
+		for(Object l:$list){
+			System.out.println(l);
+			modify ((Log)l) { setFired(true); }	
+		};
 		System.out.println("Activate Brute-force alarm");
 end
 
 rule "Profile change after 5 bad attepmts from same ip"
 	when
-		$fl : ProfileChange( $ip : ipAddress , $ts : timestamp, $sys : systemType)
+		$fl : ProfileChange( $ip : ipAddress , $ts : timestamp, $sys : systemType, fired != true)
 		$sl : SuccessfulLogin( ipAddress == $ip, $ts2 : timestamp ,!timestamp.after($ts), systemType == $sys)
 		$list : List(size>5) from collect( FailedLogin( ipAddress == $ip, !timestamp.after($ts2)) over window:time(90s))
 	then
 		System.out.println("Someone changed profile after few bad attempts");
+		modify ((Log)$fl) { setFired(true); }
 		insert(new ProfileChangedAfterFailedLoginEvent($fl.getIpAddress(), "Profile change after 5 bad attepmts from same ip"));
 end
 
 rule "10 threats detected on same ip"
 	when
 		account : Account( $ip : ipAddress)
-		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip ) over window:time(10d))
+		$list : List(size>6) from collect( ThreatDetected( ipAddress == $ip , fired != true ) over window:time(10d))
 	then
 		System.out.println("Ip address with high risk detected");
+		for(Object l:$list){
+			System.out.println(l);
+			modify ((Log)l) { setFired(true); }	
+		};
 		insert(new MultipleThreatsDetectedEvent($ip, "Ip address with high risk detected"));
 end
 

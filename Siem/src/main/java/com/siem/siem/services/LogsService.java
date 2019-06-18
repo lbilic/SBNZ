@@ -20,9 +20,16 @@ public class LogsService {
 	@Autowired
 	SessionHandler sessionHandler;
 	
+	@Autowired
+	TestService testService;
+	
 	public void insertLog(Log l) {
+		l.setFired(false);
 		sessionHandler.createNewSession();
 		sessionHandler.insertLogIntoSession(l);
+		KieSession kieSession = SiemApplication.allSessions.get("SiemSession");
+		kieSession.fireAllRules();
+		testService.testDrl();
 	}
 	
 	public void insertAccount(Account l) {
